@@ -4,9 +4,7 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 
 import '../../flutter_chat_ui.dart';
 import '../util.dart';
-import 'attachment_button.dart';
 import 'inherited_chat_theme.dart';
-import 'send_button.dart';
 
 class NewLineIntent extends Intent {
   const NewLineIntent();
@@ -164,37 +162,42 @@ class _InputState extends State<Input> {
               padding: const EdgeInsets.all(16),
               child: Material(
                 borderRadius: BorderRadius.circular(55),
-                color: widget.isWeb == true
-                    ? AppColor.backgroundColor
-                    : AppColor.white,
+                color:
+                    widget.isWeb == true
+                        ? AppColor.backgroundColor
+                        : AppColor.white,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 7,
+                  ),
                   child: Row(
                     children: [
                       if (widget.onAttachmentPressed != null) _leftWidget(),
                       Container(
-                          margin: const EdgeInsets.only(right: 8, top: 5),
-                          height: 20,
-                          child: const VerticalDivider(
-                            color: AppColor.dividerColor,
-                          )),
+                        margin: const EdgeInsets.only(right: 8, top: 5),
+                        height: 20,
+                        child: const VerticalDivider(
+                          color: AppColor.dividerColor,
+                        ),
+                      ),
                       Expanded(
                         child: TextField(
                           controller: _textController,
-                          cursorColor: InheritedChatTheme.of(context)
-                              .theme
-                              .inputTextCursorColor,
+                          cursorColor:
+                              InheritedChatTheme.of(
+                                context,
+                              ).theme.inputTextCursorColor,
                           decoration: InputDecoration(
                             isDense: true,
                             border: InputBorder.none,
                             hintText: 'Type something here',
-                            hintStyle: Theme.of(context)
-                                .textTheme
-                                .bodyText2!
-                                .copyWith(
-                                    fontSize: 13,
-                                    color: AppColor.textAndStarGrey),
+                            hintStyle: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium!.copyWith(
+                              fontSize: 13,
+                              color: AppColor.textAndStarGrey,
+                            ),
                           ),
                           // decoration: InheritedChatTheme.of(context).theme.inputTextDecoration.copyWith(hintStyle: InheritedChatTheme.of(context).theme
                           //           .inputTextStyle
@@ -223,9 +226,7 @@ class _InputState extends State<Input> {
                       ),
                       Visibility(
                         visible: _sendButtonVisible,
-                        child: SendButton(
-                          onPressed: _handleSendPressed,
-                        ),
+                        child: SendButton(onPressed: _handleSendPressed),
                       ),
                     ],
                   ),

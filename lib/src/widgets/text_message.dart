@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_link_previewer/flutter_link_previewer.dart'
     show LinkPreview, regexLink;
+
 import '../../flutter_chat_ui.dart';
 import '../util.dart';
 import 'inherited_chat_theme.dart';
@@ -31,7 +32,7 @@ class TextMessage extends StatelessWidget {
 
   /// See [LinkPreview.onPreviewDataFetched]
   final void Function(types.TextMessage, types.PreviewData)?
-      onPreviewDataFetched;
+  onPreviewDataFetched;
 
   /// Show user name for the received message. Useful for a group chat.
   final bool showName;
@@ -39,57 +40,62 @@ class TextMessage extends StatelessWidget {
   /// Enables link (URL) preview
   final bool usePreviewData;
 
-  void _onPreviewDataFetched(types.PreviewData previewData) {
+  _onPreviewDataFetched(types.PreviewData previewData) {
     if (message.previewData == null) {
       onPreviewDataFetched?.call(message, previewData);
     }
   }
 
-  Widget _linkPreview(
-    types.User user,
-    double width,
-    BuildContext context,
-  ) {
-    final bodyTextStyle = user.id == message.author.id
-        ? InheritedChatTheme.of(context).theme.sentMessageBodyTextStyle
-        : InheritedChatTheme.of(context).theme.receivedMessageBodyTextStyle;
-    final linkDescriptionTextStyle = user.id == message.author.id
-        ? InheritedChatTheme.of(context)
-            .theme
-            .sentMessageLinkDescriptionTextStyle
-        : InheritedChatTheme.of(context)
-            .theme
-            .receivedMessageLinkDescriptionTextStyle;
-    final linkTitleTextStyle = user.id == message.author.id
-        ? InheritedChatTheme.of(context).theme.sentMessageLinkTitleTextStyle
-        : InheritedChatTheme.of(context)
-            .theme
-            .receivedMessageLinkTitleTextStyle;
+  Widget _linkPreview(types.User user, double width, BuildContext context) {
+    final bodyTextStyle =
+        user.id == message.author.id
+            ? InheritedChatTheme.of(context).theme.sentMessageBodyTextStyle
+            : InheritedChatTheme.of(context).theme.receivedMessageBodyTextStyle;
+    final linkDescriptionTextStyle =
+        user.id == message.author.id
+            ? InheritedChatTheme.of(
+              context,
+            ).theme.sentMessageLinkDescriptionTextStyle
+            : InheritedChatTheme.of(
+              context,
+            ).theme.receivedMessageLinkDescriptionTextStyle;
+    final linkTitleTextStyle =
+        user.id == message.author.id
+            ? InheritedChatTheme.of(context).theme.sentMessageLinkTitleTextStyle
+            : InheritedChatTheme.of(
+              context,
+            ).theme.receivedMessageLinkTitleTextStyle;
 
-    final color = getUserAvatarNameColor(message.author,
-        InheritedChatTheme.of(context).theme.userAvatarNameColors);
+    final color = getUserAvatarNameColor(
+      message.author,
+      InheritedChatTheme.of(context).theme.userAvatarNameColors,
+    );
     final name = getUserName(message.author);
 
     return LinkPreview(
       enableAnimation: true,
-      header: showName ? name : null,
-      headerStyle: InheritedChatTheme.of(context)
-          .theme
-          .userNameTextStyle
-          .copyWith(color: color),
-      linkStyle: bodyTextStyle,
-      metadataTextStyle: linkDescriptionTextStyle,
-      metadataTitleStyle: linkTitleTextStyle,
-      onPreviewDataFetched: _onPreviewDataFetched,
-      padding: EdgeInsets.symmetric(
-        horizontal:
-            InheritedChatTheme.of(context).theme.messageInsetsHorizontal,
-        vertical: InheritedChatTheme.of(context).theme.messageInsetsVertical,
-      ),
-      previewData: message.previewData,
+
+      // The text that should be parsed to find the first URL
       text: message.text,
-      textStyle: bodyTextStyle,
-      width: width,
+      // Pass the cached preview data to avoid re-fetching
+
+      // Callback to store the fetched preview data
+      // onLinkPreviewDataFetched: _onPreviewDataFetched,
+      // For a chat bubble, you would pass the message text here
+      // to align the preview with the text bubble.
+      parentContent: showName ? name : null,
+      descriptionTextStyle: linkDescriptionTextStyle,
+      titleTextStyle: linkTitleTextStyle,
+
+      // Customization example
+      borderRadius: 4,
+      sideBorderColor: Colors.white,
+      sideBorderWidth: 4,
+      insidePadding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+      outsidePadding: const EdgeInsets.symmetric(vertical: 4),
+      onLinkPreviewDataFetched: (LinkPreviewData) {
+        _onPreviewDataFetched(LinkPreviewData as types.PreviewData);
+      },
     );
   }
 
@@ -99,7 +105,10 @@ class TextMessage extends StatelessWidget {
     bool enlargeEmojis,
   ) {
     final theme = InheritedChatTheme.of(context).theme;
-    final color = getUserAvatarNameColor(message.author, theme.userAvatarNameColors);
+    final color = getUserAvatarNameColor(
+      message.author,
+      theme.userAvatarNameColors,
+    );
     final name = getUserName(message.author);
 
     return Column(
@@ -117,13 +126,14 @@ class TextMessage extends StatelessWidget {
           ),
         SelectableText(
           message.text,
-          style: user.id == message.author.id
-              ? enlargeEmojis
-                  ? theme.sentEmojiMessageTextStyle
-                  : TextStyle(color: AppColor.white,fontSize: 15)
-              : enlargeEmojis
+          style:
+              user.id == message.author.id
+                  ? enlargeEmojis
+                      ? theme.sentEmojiMessageTextStyle
+                      : TextStyle(color: AppColor.white, fontSize: 15)
+                  : enlargeEmojis
                   ? theme.receivedEmojiMessageTextStyle
-                  : TextStyle(color: AppColor.black,fontSize: 15),
+                  : TextStyle(color: AppColor.black, fontSize: 15),
           textWidthBasis: TextWidthBasis.longestLine,
         ),
       ],
@@ -134,7 +144,7 @@ class TextMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     final _enlargeEmojis =
         emojiEnlargementBehavior != EmojiEnlargementBehavior.never &&
-            isConsistsOfEmojis(emojiEnlargementBehavior, message);
+        isConsistsOfEmojis(emojiEnlargementBehavior, message);
     final _theme = InheritedChatTheme.of(context).theme;
     final _user = InheritedUser.of(context).user;
     final _width = MediaQuery.of(context).size.width;
@@ -150,9 +160,10 @@ class TextMessage extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: _enlargeEmojis && hideBackgroundOnEmojiMessages
-            ? 0.0
-            : _theme.messageInsetsHorizontal,
+        horizontal:
+            _enlargeEmojis && hideBackgroundOnEmojiMessages
+                ? 0.0
+                : _theme.messageInsetsHorizontal,
         vertical: _theme.messageInsetsVertical,
       ),
       child: _textWidgetBuilder(_user, context, _enlargeEmojis),
